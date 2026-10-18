@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "frontend",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd /Users/kimminki/Documents/DuelogByAI/frontend && corepack pnpm dev"
+      ],
+      "port": 3000
+    },
+    {
+      "name": "backend",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd /Users/kimminki/Documents/DuelogByAI/backend && uv run alembic upgrade head && uv run uvicorn app.main:app --reload --port 8000"
+      ],
+      "port": 8000
+    }
+  ]
+}
