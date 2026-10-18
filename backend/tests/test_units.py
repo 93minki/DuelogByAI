@@ -85,3 +85,16 @@ async def test_broadcaster_tracks_partial_and_fans_out():
     while (item := q.get_nowait()) is not None:
         events.append(item[0])
     assert events == ["turn_start", "search", "token", "turn_reset", "turn_end"]
+
+
+def test_clean_text_removes_control_chars_but_keeps_newlines():
+    from app.text import clean_deep, clean_text
+
+    assert clean_text("a\x00b\x18c\n\td") == "abc\n\td"
+    assert clean_deep({"q": ["\x00검색\x19"], "n": 1}) == {"q": ["검색"], "n": 1}
+
+
+def test_clean_query_decodes_literal_escapes():
+    from app.text import clean_query
+
+    assert clean_query("\\uc54c\\uace0  \\ubcf4\\ub2c8 \x00") == "알고 보니"

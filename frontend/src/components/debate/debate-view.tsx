@@ -141,7 +141,8 @@ export function DebateView({ debateId }: { debateId: string }) {
       {debate.status === "failed" && <Notice tone="error">{debate.error ?? "토론 진행 중 오류가 발생했습니다."}</Notice>}
 
       {debate.summary && <SummarySection summary={debate.summary} sources={sourceMap} />}
-      <SourceList sources={debate.sources} />
+      {/* 진행 중에는 발언 흐름을 끊지 않도록 출처 목록을 숨기고, [n] 툴팁으로만 보여준다. */}
+      {!running && <SourceList sources={debate.sources} />}
       <div ref={bottomRef} />
     </div>
   );

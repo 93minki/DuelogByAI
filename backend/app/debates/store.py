@@ -8,6 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.models import Debate, DebateStatus, Phase, Source, Speaker, Summary, Turn
+from app.text import clean_deep, clean_text
 
 
 class DebateStore:
@@ -21,15 +22,17 @@ class DebateStore:
             debate = await s.get(Debate, uuid.UUID(debate_id))
             if debate is None:
                 return
-            debate.proposition = proposition
-            debate.pro_stance = pro_stance
-            debate.con_stance = con_stance
+            debate.proposition = clean_text(proposition)
+            debate.pro_stance = clean_text(pro_stance)
+            debate.con_stance = clean_text(con_stance)
             await s.commit()
 
     async def save_turn(
         self, debate_id: str, turn: dict[str, Any], new_sources: list[dict[str, Any]]
     ) -> None:
         did = uuid.UUID(debate_id)
+        turn = clean_deep(turn)
+        new_sources = clean_deep(new_sources)
         async with self._sessions() as s:
             existing_numbers = set(
                 await s.scalars(select(Source.number).where(Source.debate_id == did))
@@ -64,6 +67,7 @@ class DebateStore:
 
     async def save_summary(self, debate_id: str, summary: dict[str, Any]) -> None:
         did = uuid.UUID(debate_id)
+        summary = clean_deep(summary)
         async with self._sessions() as s:
             row = await s.get(Summary, did)
             if row is None:

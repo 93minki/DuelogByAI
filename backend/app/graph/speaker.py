@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 
 from app.graph.deps import GraphDeps
 from app.graph.sources import format_hits_for_model, register_hits
+from app.text import clean_query
 
 
 class web_search(BaseModel):  # noqa: N801 - 도구 이름이 곧 클래스 이름
@@ -78,7 +79,8 @@ async def speak(
                 content = SEARCH_LIMIT_NOTICE
             else:
                 search_calls += 1
-                query = str((call.get("args") or {}).get("query", "")).strip()
+                # 모델이 깨진 제어 문자를 섞어 보내는 경우가 있어 정리한다.
+                query = clean_query(str((call.get("args") or {}).get("query", "")))
                 queries.append(query)
                 await deps.emit("search", {"seq": seq, "query": query})
                 try:
